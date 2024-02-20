@@ -45,6 +45,7 @@ jobs:
       - name: Build docker image
         uses: docker/build-push-action@v5
         with:
+          push: true
           context: .
           file: ./Dockerfile.demos
           tags: ${{env.DOCKER_REPO}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
