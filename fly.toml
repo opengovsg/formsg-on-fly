@@ -98,5 +98,9 @@ primary_region = 'sin'
   min_machines_running = 0
   processes = ['app']
 
+[[statics]]
+  guest_path = "/dist/frontend"
+  url_prefix = "/"
+
 [[vm]]
   size = 'shared-cpu-1x'
