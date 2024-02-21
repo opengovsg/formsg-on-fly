@@ -42,6 +42,9 @@ ENV NODE_OPTIONS="--max-old-space-size=4096 --openssl-legacy-provider"
 
 RUN npm run build
 
+# Move mockpass to prod dependency since we need the static certs
+RUN npm install -P @opengovsg/mockpass
+
 RUN npm prune --production --legacy-peer-deps
 
 # This stage builds the final container
