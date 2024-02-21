@@ -101,7 +101,7 @@ primary_region = 'sin'
   processes = ['app']
 
 [[statics]]
-  guest_path = "/dist/frontend"
+  guest_path = "/opt/formsg/dist/frontend"
   url_prefix = "/"
 
 [[vm]]
