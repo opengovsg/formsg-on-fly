@@ -82,7 +82,7 @@ primary_region = 'sin'
   SGID_ADMIN_LOGIN_REDIRECT_URI = "https://form.demos.sg/api/v3/auth/sgid/login"
   SGID_FORM_LOGIN_REDIRECT_URI = "https://form.demos.sg/sgid/login"
   SGID_PRIVATE_KEY = "./node_modules/@opengovsg/mockpass/static/certs/key.pem"
-  SGID_PUBLIC_KEY = "./node_modules/@opengovsg/mockpass/static/certs/server.create"
+  SGID_PUBLIC_KEY = "./node_modules/@opengovsg/mockpass/static/certs/server.crt"
 
   SSM_ENV_SITE_NAME = "development"
   # Bearer token API key format
