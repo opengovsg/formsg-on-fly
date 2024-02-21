@@ -93,7 +93,7 @@ primary_region = 'sin'
   GA_TRACKING_ID = "mockGATrackingId"
 
 [http_service]
-  internal_port = 4545
+  internal_port = 5000
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true

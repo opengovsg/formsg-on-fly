@@ -93,7 +93,7 @@ RUN addgroup -S formsguser && adduser -S -g formsguser formsguser
 USER formsguser
 
 ENV NODE_ENV=production
-EXPOSE 4545
+EXPOSE 5000
 
 # tini is the init process that will adopt orphaned zombie processes
 # e.g. chromium when launched to create a new PDF
