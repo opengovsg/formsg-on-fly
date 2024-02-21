@@ -97,5 +97,5 @@ EXPOSE 4545
 
 # tini is the init process that will adopt orphaned zombie processes
 # e.g. chromium when launched to create a new PDF
-ENTRYPOINT [ "tini", "--" ]
+ENTRYPOINT [ "tini", "-s", "--" ]
 CMD [ "npm", "start" ]
