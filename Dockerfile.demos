@@ -49,13 +49,16 @@ RUN npm prune --production --legacy-peer-deps
 
 # This stage builds the final container
 FROM node:hydrogen-alpine3.18
-LABEL maintainer=FormSG<formsg@data.gov.sg>
+LABEL maintainer="Demos at OGP<demos@open.gov.sg>"
 WORKDIR /opt/formsg
 
 # Install build from backend-build
 COPY --from=build /build/node_modules /opt/formsg/node_modules
 COPY --from=build /build/package.json /opt/formsg/package.json
 COPY --from=build /build/dist /opt/formsg/dist
+
+# Grab Singpass RP jwks config from __tests__
+COPY --from=build /build/__tests__/setup/certs /opt/formsg/__tests__/setup/certs
 
 # Built backend goes back to root working directory
 RUN mv /opt/formsg/dist/backend/src /opt/formsg/
