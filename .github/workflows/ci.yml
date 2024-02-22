@@ -27,6 +27,15 @@ jobs:
           path: demos
       - name: Move demos contents into local root
         run: mv demos/* .
+
+      - name: Substitute index.html OG params (delivered by Fly's proxy)
+        run: |
+          cat frontend/public/index.html | \
+            sed 's/__OG_TITLE__/[DEMO] Form @ demos.sg/' | \
+            sed 's/__OG_DESCRIPTION__/A demo of FormSG by demos.sg/' | \
+            sed 's/__OG_IMAGE__/og-img-metatag-publicform.png/' > frontend/public/index2.html && \
+          mv frontend/public/index2.html frontend/public/index.html
+
       - name: Set app version
         run: |
           echo "APP_VERSION=$(jq -r .version package.json)-$(echo ${GITHUB_REF##*/})-$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_ENV
