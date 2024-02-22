@@ -41,6 +41,7 @@ COPY . ./
 ENV NODE_OPTIONS="--max-old-space-size=4096 --openssl-legacy-provider"
 
 RUN npm run build
+RUN cat ./assets/demo-watermark.css >> `ls ./dist/frontend/static/css/*.css`
 
 # Move mockpass to prod dependency since we need the static certs
 RUN npm install -P @opengovsg/mockpass
