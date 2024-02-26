@@ -28,7 +28,10 @@ jobs:
       - name: Move demos contents into local root
         run: mv demos/* .
       - name: Replace files with demo-specific ones
-        run: mv replacements/GovtMasthead/* frontend/src/components/GovtMasthead
+        run: |
+          mv replacements/GovtMasthead/* frontend/src/components/GovtMasthead && \
+          mv replacements/FormLogo/* frontend/src/features/public-form/components/FormLogo && \
+          mv replacements/DesignDrawer/* frontend/src/features/admin-form/create/builder-and-design/BuilderAndDesignDrawer/DesignDrawer
 
       - name: Substitute index.html OG params (delivered by Fly's proxy)
         run: |
