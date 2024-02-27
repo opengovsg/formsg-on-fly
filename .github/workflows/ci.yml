@@ -29,10 +29,11 @@ jobs:
         run: mv demos/* .
       - name: Replace files with demo-specific ones
         run: |
-          mv replacements/GovtMasthead/* frontend/src/components/GovtMasthead && \
-          mv replacements/FormLogo/* frontend/src/features/public-form/components/FormLogo && \
-          mv replacements/DesignDrawer/* frontend/src/features/admin-form/create/builder-and-design/BuilderAndDesignDrawer/DesignDrawer && \
+          mv replacements/GovtMasthead/* frontend/src/components/GovtMasthead
+          mv replacements/FormLogo/* frontend/src/features/public-form/components/FormLogo
+          mv replacements/DesignDrawer/* frontend/src/features/admin-form/create/builder-and-design/BuilderAndDesignDrawer/DesignDrawer
           mv replacements/EditMobile/* frontend/src/features/admin-form/create/builder-and-design/BuilderAndDesignDrawer/EditFieldDrawer/edit-fieldtype/EditMobile
+          mv replacements/locales/* frontend/src/i18n/locales
 
       - name: Substitute index.html OG params (delivered by Fly's proxy)
         run: |

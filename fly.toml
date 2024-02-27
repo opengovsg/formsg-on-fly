@@ -14,7 +14,7 @@ swap_size_mb = 1024
   FE_APP_URL = "https://form.demos.sg"
   IS_GENERAL_MAINTENANCE = "warn:DO NOT GIVE YOUR PERSONAL INFORMATION. This platform is a demo of FormSG for evaluation purposes only."
   ADMIN_BANNER_CONTENT = 'This platform is a demo of FormSG for evaluation purposes only. Data resets every 3 hours starting from 00:00 UTC. For enquiries, visit https://form.gov.sg'
-  IS_LOGIN_BANNER = 'This platform is a demo of FormSG for evaluation purposes only. For enquiries, visit https://form.gov.sg'
+  IS_LOGIN_BANNER = 'This platform is a demo of FormSG for evaluation purposes only. Log ins are only supported via email. For enquiries, visit https://form.gov.sg'
 
   # S3 Bucket config
   # We use Cloudflare R2, so set region to us-east-1
