@@ -35,6 +35,7 @@ jobs:
           mv replacements/EditMobile/* frontend/src/features/admin-form/create/builder-and-design/BuilderAndDesignDrawer/EditFieldDrawer/edit-fieldtype/EditMobile
           mv replacements/locales/* frontend/src/i18n/locales
           mv replacements/Home/* frontend/src/pages/Landing/Home
+          mv replacements/login/* frontend/src/features/login/components
 
       - name: Substitute index.html OG params (delivered by Fly's proxy)
         run: |
