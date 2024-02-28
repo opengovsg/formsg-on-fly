@@ -40,7 +40,7 @@ jobs:
         run: |
           cat frontend/public/index.html | \
             sed 's/__OG_TITLE__/[DEMO] Form @ demos.sg/' | \
-            sed 's/__OG_DESCRIPTION__/A demo of FormSG by demos.sg/' | \
+            sed 's/__OG_DESCRIPTION__/A demo of FormSG on demos.sg/' | \
             sed 's/__OG_IMAGE__/og-img-metatag-publicform.png/' > frontend/public/index2.html && \
           mv frontend/public/index2.html frontend/public/index.html
 
