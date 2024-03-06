@@ -31,6 +31,7 @@ jobs:
         run: |
           mv replacements/GovtMasthead/* frontend/src/components/GovtMasthead
           mv replacements/FormLogo/* frontend/src/features/public-form/components/FormLogo
+          mv replacements/create/* frontend/src/features/admin-form/create
           mv replacements/DesignDrawer/* frontend/src/features/admin-form/create/builder-and-design/BuilderAndDesignDrawer/DesignDrawer
           mv replacements/EditMobile/* frontend/src/features/admin-form/create/builder-and-design/BuilderAndDesignDrawer/EditFieldDrawer/edit-fieldtype/EditMobile
           mv replacements/locales/* frontend/src/i18n/locales
@@ -39,6 +40,7 @@ jobs:
           mv replacements/public-form/* frontend/src/features/public-form
           mv replacements/express/* src/app/loaders/express
           mv replacements/utils/* src/app/utils
+          mv replacements/field/* shared/types/field
 
       - name: Substitute index.html OG params (delivered by Fly's proxy)
         run: |
