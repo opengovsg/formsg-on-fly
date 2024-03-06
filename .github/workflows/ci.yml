@@ -36,6 +36,9 @@ jobs:
           mv replacements/locales/* frontend/src/i18n/locales
           mv replacements/Home/* frontend/src/pages/Landing/Home
           mv replacements/login/* frontend/src/features/login/components
+          mv replacements/public-form/* frontend/src/features/public-form
+          mv replacements/express/* src/app/loaders/express
+          mv replacements/utils/* src/app/utils
 
       - name: Substitute index.html OG params (delivered by Fly's proxy)
         run: |
