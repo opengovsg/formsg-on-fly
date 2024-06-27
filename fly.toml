@@ -93,6 +93,9 @@ swap_size_mb = 1024
 
   GA_TRACKING_ID = "mockGATrackingId"
 
+  POSTMAN_MOP_CAMPAIGN_ID="notused"
+  POSTMAN_MOP_CAMPAIGN_API_KEY="notused"
+  POSTMAN_BASE_URL="notused"
 [http_service]
   internal_port = 5000
   force_https = true
