@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Box, FormControl, useDisclosure } from '@chakra-ui/react'
+import { Box, FormControl } from '@chakra-ui/react'
 import { extend, pick } from 'lodash'
 
 import { MobileFieldBase } from '~shared/types/field'
@@ -14,14 +14,11 @@ import Toggle from '~components/Toggle'
 import { useFreeSmsQuota } from '~features/admin-form/common/queries'
 
 import { CreatePageDrawerContentContainer } from '../../../../../common'
-import { useCreateTabForm } from '../../../../useCreateTabForm'
 import { FormFieldDrawerActions } from '../common/FormFieldDrawerActions'
 import { EditFieldProps } from '../common/types'
 import { useEditFieldForm } from '../common/useEditFieldForm'
 
 import { SmsCountMessage } from './SmsCountMessage'
-import { SmsCountsModal } from './SmsCountsModal'
-import { TwilioCredentialsMessage } from './TwilioCredentialsMessage'
 
 const EDIT_MOBILE_KEYS = [
   'title',
@@ -33,7 +30,7 @@ const EDIT_MOBILE_KEYS = [
 
 type EditMobileProps = EditFieldProps<MobileFieldBase>
 
-type EditMobileInputs = Pick<MobileFieldBase, typeof EDIT_MOBILE_KEYS[number]>
+type EditMobileInputs = Pick<MobileFieldBase, (typeof EDIT_MOBILE_KEYS)[number]>
 
 export const EditMobile = ({ field }: EditMobileProps): JSX.Element => {
   const {
@@ -57,20 +54,7 @@ export const EditMobile = ({ field }: EditMobileProps): JSX.Element => {
     [],
   )
 
-  const { data: form } = useCreateTabForm()
-  const hasTwilioCredentials = useMemo(() => !!form?.msgSrvcName, [form])
-
   const { data: freeSmsCount } = useFreeSmsQuota()
-  const isToggleVfnDisabled = useMemo(() => {
-    if (!freeSmsCount) return true
-    return (
-      !field.isVerifiable &&
-      !hasTwilioCredentials &&
-      freeSmsCount.freeSmsCounts >= freeSmsCount.quota
-    )
-  }, [field.isVerifiable, freeSmsCount, hasTwilioCredentials])
-
-  const smsCountsDisclosure = useDisclosure()
 
   return (
     <>
@@ -105,25 +89,12 @@ export const EditMobile = ({ field }: EditMobileProps): JSX.Element => {
         <Box>
           <FormControl isReadOnly={true} isDisabled={true}>
             <Toggle
-              {...register('isVerifiable', {
-                onChange: (e) => {
-                  if (e.target.checked && !hasTwilioCredentials) {
-                    smsCountsDisclosure.onOpen()
-                  }
-                },
-              })}
+              {...register('isVerifiable')}
               label="OTP verification"
-              description="OTP verification has been disabled in this demo. Respondents must verify by entering a code sent to them. If you have added Twilio credentials, please test this OTP verification feature to make sure your credentials are accurate."
+              description="OTP verification has been disabled in this demo. Respondents must verify by entering a code sent to them."
             />
           </FormControl>
-          <SmsCountMessage
-            hasTwilioCredentials={hasTwilioCredentials}
-            freeSmsCount={freeSmsCount}
-          />
-          <TwilioCredentialsMessage
-            freeSmsCount={freeSmsCount}
-            hasTwilioCredentials={hasTwilioCredentials}
-          />
+          <SmsCountMessage freeSmsCount={freeSmsCount} />
         </Box>
         <FormFieldDrawerActions
           isLoading={isLoading}
@@ -132,11 +103,6 @@ export const EditMobile = ({ field }: EditMobileProps): JSX.Element => {
           handleCancel={handleCancel}
         />
       </CreatePageDrawerContentContainer>
-      <SmsCountsModal
-        freeSmsCount={freeSmsCount}
-        isOpen={smsCountsDisclosure.isOpen}
-        onClose={smsCountsDisclosure.onClose}
-      />
     </>
   )
 }
