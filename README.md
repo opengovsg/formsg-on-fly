@@ -10,12 +10,7 @@ This repository contains customizations and configuration to deploy FormSG as a 
 
 ### Why the overlay approach?
 
-The overlay essentially **"de-governments" FormSG** - transforming a Singapore government platform into a generic form builder demo while preserving core functionality. This approach:
-
-- **Removes Singapore-specific features** (SingPass, government branding, compliance requirements)
-- **Simplifies complex enterprise features** (multi-language, advanced permissions, status tracking)
-- **Adapts infrastructure** (S3 → Cloudflare R2, government domains → generic)
-- **Maintains upstream compatibility** by keeping changes as minimal file replacements rather than forks
+The overlay essentially **"de-governments" FormSG** - transforming a Singapore government platform into a generic form builder demo while preserving core functionality.
 
 ### The Universal Pattern
 
