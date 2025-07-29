@@ -30,7 +30,7 @@ jobs:
       config: ${{ steps.changes.outputs.config }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # @v3.0.2
         id: changes
         with:
           filters: |
