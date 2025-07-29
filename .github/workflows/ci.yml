@@ -55,7 +55,7 @@ jobs:
 
       - name: Set app version
         run: |
-          echo "APP_VERSION=$(jq -r .version demo-overlay/package.json)-$(echo ${GITHUB_REF##*/})-$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_ENV
+          echo "APP_VERSION=$(jq -r .version package.json)-$(echo ${GITHUB_REF##*/})-$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
