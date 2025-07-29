@@ -102,6 +102,7 @@ swap_size_mb = 1024
 
   GROWTHBOOK_CLIENT_KEY="notused"
   SES_CONFIG_SET="notused"
+
 [http_service]
   internal_port = 5000
   force_https = true
@@ -109,6 +110,8 @@ swap_size_mb = 1024
   auto_start_machines = true
   min_machines_running = 1
   processes = ['app']
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
 
 [[statics]]
   guest_path = "/opt/formsg/dist/frontend"
