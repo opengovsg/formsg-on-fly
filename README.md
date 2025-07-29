@@ -8,12 +8,35 @@ A demonstration deployment of [FormSG](https://github.com/opengovsg/FormSG) (Sin
 
 This repository contains customizations and configuration to deploy FormSG as a public demo. It uses an "overlay" approach - the base FormSG codebase is merged with demo-specific replacements during deployment.
 
-### Key Features
-- **Public demo** with automated data resets every 3 hours
-- **MockPass integration** for testing SingPass/CorpPass authentication
-- **Cloudflare R2** for S3-compatible storage
-- **Singapore region deployment** on Fly.io
-- **Automated CI/CD** with GitHub Actions
+### Why the overlay approach?
+
+The overlay essentially **"de-governments" FormSG** - transforming a Singapore government platform into a generic form builder demo while preserving core functionality. This approach:
+
+- **Removes Singapore-specific features** (SingPass, government branding, compliance requirements)
+- **Simplifies complex enterprise features** (multi-language, advanced permissions, status tracking)
+- **Adapts infrastructure** (S3 → Cloudflare R2, government domains → generic)
+- **Maintains upstream compatibility** by keeping changes as minimal file replacements rather than forks
+
+### The Universal Pattern
+
+While this repository demonstrates deploying FormSG on Fly.io, the overlay deployment pattern is generalizable to other platforms and applications:
+
+**Core Architecture:**
+1. **Base + Overlay** - Clone upstream → Apply customizations → Deploy
+2. **Platform-agnostic workflow** - `just setup` → edit → test → sync → commit
+3. **Smart CI/CD** - Conditional builds based on file changes (code vs config)
+
+**Potential Applications:**
+- **formsg-on-railway** - Replace `fly.toml` with Railway config, same Docker approach
+- **formsg-on-render** - Adapt to Render's web service deployment model
+- **formsg-on-aws** - ECS/Fargate deployment with ALB and RDS
+- etc.
+
+**What Makes This Reusable:**
+- Just commands are infrastructure-agnostic
+- `replacements/` directory works for any codebase structure
+- CI optimization applies universally
+- Could be templated as `create-overlay-deployment` CLI
 
 ## Quick Start
 
@@ -40,6 +63,56 @@ just clean
 ```
 
 Run `just --list` to see all available commands.
+
+### Dev Workflow
+
+```mermaid
+flowchart TD
+    %% Main development cycle
+    A["🚀 just setup"] --> B["📝 Edit in .formsg-base/"]
+    B --> C["🧪 just start"]
+    C --> D{Changes good?}
+    D -->|No| B
+    D -->|Yes| E["🔄 just sync"]
+    E --> F["💾 git commit"]
+    F --> G{Continue?}
+    G -->|More changes| B
+    G -->|Fresh start| A
+
+    style A fill:#e1f5fe
+    style E fill:#f3e5f5
+    style F fill:#e8f5e8
+```
+
+### What's Different in the Demo?
+<!-- NOTE: hmm.. should I just remove this section. the replacements folder is already a self=documenting code of what's different -->
+
+The overlay transforms FormSG in several key ways:
+
+**Visual Changes:**
+- Adds "SPECIMEN - For Demo Only" watermark across all pages
+- Replaces Singapore government masthead with "A product demo from Open Government Products"
+- Changes login placeholders from `.gov.sg` to generic email providers
+- Swaps Singapore lion icon with simple house icon
+
+**Feature Simplifications:**
+- Disables custom logo upload functionality
+- Removes image and address field types from form builder
+- Strips out multi-language/internationalization features
+- Removes enterprise features (status tracking, advanced permissions)
+- Limits SingPass authentication to test ID only
+
+**Infrastructure Adaptations:**
+- Adds Cloudflare R2 storage support (instead of AWS S3 only)
+- Updates Content Security Policy for demo environment
+- Forces development mode settings for demo use
+
+### Key Features
+- **Public demo** with automated data resets every 3 hours
+- **MockPass integration** for testing SingPass/CorpPass authentication
+- **Cloudflare R2** for S3-compatible storage
+- **Singapore region deployment** on Fly.io
+- **Automated CI/CD** with GitHub Actions
 
 ## Architecture
 
