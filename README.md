@@ -28,10 +28,10 @@ While this repository demonstrates deploying FormSG on Fly.io, the overlay deplo
 - etc.
 
 **What Makes This Reusable:**
-- Just commands are infrastructure-agnostic
+- Dev workflow is infrastructure-agnostic
 - `replacements/` directory works for any codebase structure
 - CI optimization applies universally
-- Could be templated as `create-overlay-deployment` CLI
+- Could be templated, maybe...?
 
 ## Quick Start
 
