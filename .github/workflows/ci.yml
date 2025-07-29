@@ -6,8 +6,8 @@ on:
     branches: [main]
     paths:
       - 'replacements/**'
-      - 'fly.toml'
       - 'Dockerfile.demos'
+      - 'fly.toml'
       - 'bin/**'
       - '.github/workflows/ci.yml'
   pull_request:
@@ -23,12 +23,35 @@ on:
     - cron: '0 5 * * 1'
 
 jobs:
-  deploy:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.changes.outputs.code }}
+      config: ${{ steps.changes.outputs.config }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            code:
+              - 'replacements/**'
+              - 'Dockerfile.demos'
+            config:
+              - 'fly.toml'
+              - 'bin/**'
+              - '.github/workflows/ci.yml'
+
+  build:
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
       IMAGE_TAG: github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}
       DOCKER_REPO: registry.fly.io
       APP_NAME: formsg
+    outputs:
+      image_tag: ${{ env.IMAGE_TAG }}
     steps:
       - name: Checkout FormSG base
         uses: actions/checkout@v4
@@ -68,7 +91,7 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: flyctl auth docker
 
-      - name: Build docker image
+      - name: Build and push docker image
         uses: docker/build-push-action@v5
         with:
           push: true
@@ -76,12 +99,28 @@ jobs:
           file: ./demo-overlay/Dockerfile.demos
           tags: ${{env.DOCKER_REPO}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
 
+  deploy:
+    needs: [changes, build]
+    if: always() && (needs.build.result == 'success' || (needs.build.result == 'skipped' && needs.changes.outputs.config == 'true'))
+    runs-on: ubuntu-latest
+    env:
+      APP_NAME: formsg
+      DOCKER_REPO: registry.fly.io
+    steps:
+      - name: Checkout demo overlay
+        uses: actions/checkout@v4
+
+      - name: Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
       - name: Deploy to Fly
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          # Copy fly.toml from demo
-          cp demo-overlay/fly.toml .
-
-          flyctl deploy --ha=false --image ${{env.DOCKER_REPO}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
-
+          if [ "${{ needs.build.result }}" == "success" ]; then
+            # Use newly built image
+            flyctl deploy --ha=false --image ${{env.DOCKER_REPO}}/${{env.APP_NAME}}:${{ needs.build.outputs.image_tag }}
+          else
+            # Deploy with existing image (config changes only)
+            flyctl deploy --ha=false
+          fi

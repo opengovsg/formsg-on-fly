@@ -106,12 +106,10 @@ swap_size_mb = 1024
 [http_service]
   internal_port = 5000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = "suspend"
   auto_start_machines = true
   min_machines_running = 1
   processes = ['app']
-  auto_stop_machines = "suspend"
-  auto_start_machines = true
 
 [[statics]]
   guest_path = "/opt/formsg/dist/frontend"
