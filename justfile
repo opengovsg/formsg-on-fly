@@ -110,6 +110,40 @@ diff:
         fi
     done
 
+# Sync changes from .formsg-base back to replacements/
+sync:
+    #!/bin/bash
+    if [ ! -d ".formsg-base" ]; then
+        echo "❌ Demo not set up. Run 'just setup' first."
+        exit 1
+    fi
+    
+    echo "🔄 Syncing changes from .formsg-base to replacements/..."
+    
+    # Find all modified files in .formsg-base and copy them back
+    cd .formsg-base
+    modified_files=$(git status --porcelain | grep -E "^ M|^M " | cut -c4-)
+    
+    if [ -z "$modified_files" ]; then
+        echo "✅ No modified files found in .formsg-base"
+        exit 0
+    fi
+    
+    echo "📝 Found modified files:"
+    echo "$modified_files"
+    echo ""
+    
+    echo "$modified_files" | while read file; do
+        if [ -n "$file" ]; then
+            echo "📝 Syncing $file"
+            mkdir -p "../replacements/$(dirname "$file")"
+            cp "$file" "../replacements/$file"
+        fi
+    done
+    
+    echo ""
+    echo "✅ Sync complete! Modified files copied to replacements/"
+
 # Reset demo database (requires MongoDB connection)
 reset-prod-db:
     mongosh -f bin/reset-db.mongodb.js
