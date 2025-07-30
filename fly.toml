@@ -100,8 +100,8 @@ swap_size_mb = 1024
   POSTMAN_MOP_CAMPAIGN_API_KEY="notused"
   POSTMAN_BASE_URL="notused"
 
-  GROWTHBOOK_CLIENT_KEY="notused"
   SES_CONFIG_SET="notused"
+  # GROWTHBOOK_CLIENT_KEY - set as secret via fly
 
 [http_service]
   internal_port = 5000
