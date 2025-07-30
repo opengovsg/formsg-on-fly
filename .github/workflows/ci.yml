@@ -3,11 +3,25 @@ name: CI
 on:
   workflow_dispatch:
   push:
+    branches: [main]
+    paths:
+      - 'replacements/**'
+      - 'fly.toml'
+      - 'Dockerfile.demos'
+      - 'bin/**'
+      - '.github/workflows/ci.yml'
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, synchronize]
+    paths:
+      - 'replacements/**'
+      - 'fly.toml'
+      - 'Dockerfile.demos'
+      - 'bin/**'
+      - '.github/workflows/ci.yml'
   schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron:  '30 15 * * *'
+    # Monday 1PM GMT+8 = Monday 5AM UTC
+    - cron: '0 5 * * 1'
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -16,29 +30,28 @@ jobs:
       DOCKER_REPO: registry.fly.io
       APP_NAME: formsg
     steps:
-      - name: Checkout opengovsg/FormSG into the same local dir
+      - name: Checkout FormSG base
         uses: actions/checkout@v4
         with:
           repository: opengovsg/FormSG
-          ref: refs/heads/release-al2
-      - name: Checkout this repo
+          ref: release-al2
+
+      - name: Checkout demo overlay
         uses: actions/checkout@v4
         with:
-          path: demos
-      - name: Move demos contents into local root
-        run: mv demos/* .
-      - name: Replace files with demo-specific ones
-        run: |
-          cp -rf replacements/* .
-          rm -rf replacements
+          path: demo-overlay
 
-      - name: Substitute index.html OG params (delivered by Fly's proxy)
+      - name: Apply demo customizations
         run: |
-          cat frontend/index.html | \
-            sed 's/__OG_TITLE__/[DEMO] Form @ demos.sg/' | \
-            sed 's/__OG_DESCRIPTION__/A demo of FormSG on demos.sg/' | \
-            sed 's/__OG_IMAGE__/og-img-metatag-publicform.png/' > frontend/index2.html && \
-          mv frontend/index2.html frontend/index.html
+          # Apply replacements
+          cp -r demo-overlay/replacements/* . 2>/dev/null || echo "No replacements to copy"
+
+          # Apply OG meta tags
+          if [ -f frontend/index.html ]; then
+            sed -i 's/__OG_TITLE__/[DEMO] Form @ demos.sg/g' frontend/index.html
+            sed -i 's/__OG_DESCRIPTION__/A demo of FormSG on demos.sg/g' frontend/index.html
+            sed -i 's/__OG_IMAGE__/og-img-metatag-publicform.png/g' frontend/index.html
+          fi
 
       - name: Set app version
         run: |
@@ -49,7 +62,7 @@ jobs:
 
       - name: Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@master
-      
+
       - name: Auth to Fly Docker
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
@@ -60,11 +73,14 @@ jobs:
         with:
           push: true
           context: .
-          file: ./Dockerfile.demos
+          file: ./demo-overlay/Dockerfile.demos
           tags: ${{env.DOCKER_REPO}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
 
       - name: Deploy to Fly
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
+          # Copy fly.toml from demo
+          cp demo-overlay/fly.toml .
+
           flyctl deploy --ha=false --image ${{env.DOCKER_REPO}}/${{env.APP_NAME}}:${{env.APP_VERSION}}
