@@ -28,8 +28,13 @@ setup:
 
     echo "Installing dependencies and initial setup..."
     cd .formsg-base
-    npm install && npm --prefix serverless/virus-scanner install
-    npm run build:frontend
+    # npm install && npm --prefix serverless/virus-scanner install
+    if [ ! -d "dist" ]; then
+        echo "Building frontend assets..."
+        npm run build:frontend
+    else
+        echo "✅ Frontend assets already built, skipping"
+    fi
 
     echo "✅ Setup complete! You can now run 'just start' to launch the FormSG demo."
 
@@ -117,32 +122,36 @@ sync:
         echo "❌ Demo not set up. Run 'just setup' first."
         exit 1
     fi
-    
+
     echo "🔄 Syncing changes from .formsg-base to replacements/..."
-    
-    # Find all modified files in .formsg-base and copy them back
+
+    # Find all modified and new files in .formsg-base and copy them back
     cd .formsg-base
-    modified_files=$(git status --porcelain | grep -E "^ M|^M " | cut -c4-)
-    
-    if [ -z "$modified_files" ]; then
-        echo "✅ No modified files found in .formsg-base"
+    changed_files=$(git status --porcelain | grep -E "^ M|^M |^\?\?" | cut -c4-)
+
+    if [ -z "$changed_files" ]; then
+        echo "✅ No modified or new files found in .formsg-base"
         exit 0
     fi
-    
-    echo "📝 Found modified files:"
-    echo "$modified_files"
+
+    echo "📝 Found changed files:"
+    echo "$changed_files"
     echo ""
-    
-    echo "$modified_files" | while read file; do
+
+    echo "$changed_files" | while read file; do
         if [ -n "$file" ]; then
-            echo "📝 Syncing $file"
+            if git status --porcelain "$file" | grep -q "^\?\?"; then
+                echo "🆕 Syncing new file: $file"
+            else
+                echo "📝 Syncing modified file: $file"
+            fi
             mkdir -p "../replacements/$(dirname "$file")"
             cp "$file" "../replacements/$file"
         fi
     done
-    
+
     echo ""
-    echo "✅ Sync complete! Modified files copied to replacements/"
+    echo "✅ Sync complete! All changed files copied to replacements/"
 
 # Reset demo database (requires MongoDB connection)
 reset-prod-db:
