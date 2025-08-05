@@ -30,7 +30,7 @@ While this repository demonstrates deploying FormSG on Fly.io, the overlay deplo
 **What Makes This Reusable:**
 - Dev workflow is infrastructure-agnostic
 - `replacements/` directory works for any codebase structure
-- CI optimization applies universally
+- CI process applies universally
 - Could be templated, maybe...?
 
 ## Quick Start
@@ -129,7 +129,7 @@ The overlay transforms FormSG in several key ways:
 2. **Smart filtering** only deploys when relevant files change
 3. **Merges** base FormSG with demo replacements
 4. **Builds** Docker image and pushes to Fly.io registry
-5. **Deploys** to cloud with zero-downtime rolling update
+5. **Deploys** to cloud (in this case, Fly.io)
 
 ## Contributing
 
