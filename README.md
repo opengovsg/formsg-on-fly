@@ -19,7 +19,7 @@ While this repository demonstrates deploying FormSG on Fly.io, the overlay deplo
 **Core Architecture:**
 1. **Base + Overlay** - Clone upstream → Apply customizations → Deploy
 2. **Platform-agnostic workflow** - `just setup` → edit → test → sync → commit
-3. **Smart CI/CD** - Conditional builds based on file changes (code vs config)
+3. **CI/CD to detect drift** - Conditional builds based on file changes, and a CI job to detect drift with the main codebase
 
 **Potential Applications:**
 - **formsg-on-railway** - Replace `fly.toml` with Railway config, same Docker approach
