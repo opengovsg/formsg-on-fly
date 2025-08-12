@@ -4,6 +4,7 @@ export const enSG: Login = {
   LoginPage: {
     slogan: 'Build secure government forms in minutes',
     banner: 'You can now collect payments directly on your form!',
+    forbidden: 'You do not have access to this service.',
     expiredSession: 'Your login session has expired. Please login again.',
   },
   SelectProfilePage: {
