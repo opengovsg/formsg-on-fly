@@ -72,15 +72,18 @@ RUN mv /opt/formsg/dist/backend/shared /opt/formsg/
 # https://www.npmjs.com/package/puppeteer-core?activeTab=versions for corresponding versions
 
 RUN apk add --no-cache \
-# Compatible chromium versions can be found here https://pkgs.alpinelinux.org/packages?name=chromium&branch=v3.18&repo=&arch=&maintainer=
-    chromium=119.0.6045.159-r0 \
+    # Compatible chromium versions can be found here https://pkgs.alpinelinux.org/packages?name=chromium&branch=v3.19&repo=&arch=&maintainer=
+    chromium=136.0.7103.113-r0 \
     nss \
     freetype \
     freetype-dev \
     harfbuzz \
     ca-certificates \
     ttf-freefont \
-    tini
+    tini \
+    cairo \
+    pango \
+    librsvg
 
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
