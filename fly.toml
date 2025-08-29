@@ -108,12 +108,20 @@ swap_size_mb = 1024
   force_https = true
   auto_stop_machines = "suspend"
   auto_start_machines = true
-  min_machines_running = 2
+  min_machines_running = 1
   processes = ['app']
 
+# [[statics]]
+#   guest_path = "/opt/formsg/dist/frontend/assets"
+#   url_prefix = "/assets"
+
+# [[statics]]
+#   guest_path = "/opt/formsg/dist/frontend/static"
+#   url_prefix = "/static"
+
 [[statics]]
-  guest_path = "/opt/formsg/dist/frontend"
-  url_prefix = "/"
+  guest_path = "/asdfasdfghjkl"
+  url_prefix = "/asdfasdfasdfasdfghjkl"
 
 [[vm]]
   size = 'shared-cpu-1x'
