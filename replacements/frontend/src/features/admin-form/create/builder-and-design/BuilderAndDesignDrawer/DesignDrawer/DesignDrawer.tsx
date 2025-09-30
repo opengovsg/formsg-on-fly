@@ -206,14 +206,14 @@ export const DesignInput = (): JSX.Element | null => {
           >
             None
           </Radio>
-          <Radio
+          {/* <Radio
             allowDeselect={false}
             value={FormLogoState.Custom}
             isDisabled={true}
             {...register('logo.state')}
           >
             Upload custom logo (jpg, png, or gif)
-          </Radio>
+          </Radio> */}
           <FormControl
             id="attachment"
             hidden={startPageData.logo.state !== FormLogoState.Custom}
