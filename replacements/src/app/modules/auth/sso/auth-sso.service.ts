@@ -1,211 +1,208 @@
-import { errAsync, okAsync, ResultAsync } from 'neverthrow'
-import { getValidatedIdTokenClaims } from 'oauth4webapi'
-import * as oidcClient from 'openid-client'
+// import { okAsync, ResultAsync } from 'neverthrow'
+// import { getValidatedIdTokenClaims } from 'oauth4webapi'
+// import * as oidcClient from 'openid-client'
 
-import { ISsoVarsSchema } from 'src/types'
+// import { ISsoVarsSchema } from 'src/types'
 
-import { isDev } from '../../../config/config'
-import { sso } from '../../../config/features/sso.config'
-import { createLoggerWithLabel } from '../../../config/logger'
-import { resolveAppUrl } from '../../../utils/urls'
+// import { isDev } from '../../../config/config'
+// import { sso } from '../../../config/features/sso.config'
+// import { createLoggerWithLabel } from '../../../config/logger'
+// import { resolveAppUrl } from '../../../utils/urls'
 
-import { SsoCreateRedirectUrlError } from './auth-sso.errors'
+// import { SsoCreateRedirectUrlError } from './auth-sso.errors'
 
-const logger = createLoggerWithLabel(module)
-export const SSO_LOGIN_OAUTH_STATE = 'ssoLogin'
+// const logger = createLoggerWithLabel(module)
+// export const SSO_LOGIN_OAUTH_STATE = 'ssoLogin'
 
-export class AuthSsoServiceClass {
-  private clientConfigPromise: Promise<oidcClient.Configuration> | null = null
+// export class AuthSsoServiceClass {
+//   private clientConfigPromise: Promise<oidcClient.Configuration>
 
-  constructor(private ssoConfig: ISsoVarsSchema) {}
+//   constructor({
+//     discoveryUrl: _discoveryUrl,
+//     clientId,
+//     clientSecret,
+//   }: ISsoVarsSchema) {
+//     const clientAuth: oidcClient.ClientAuth | undefined = clientSecret
+//       ? oidcClient.ClientSecretPost(clientSecret)
+//       : undefined
 
-  private ensureInitialized(): void {
-    if (this.clientConfigPromise) return
+//     const clientDiscoveryRequestOptions: oidcClient.DiscoveryRequestOptions = {
+//       algorithm: 'oidc',
+//     }
 
-    const {
-      discoveryUrl: _discoveryUrl,
-      clientId,
-      clientSecret,
-    } = this.ssoConfig
-    const clientAuth: oidcClient.ClientAuth | undefined = clientSecret
-      ? oidcClient.ClientSecretPost(clientSecret)
-      : undefined
+//     if (isDev) {
+//       clientDiscoveryRequestOptions.execute = [oidcClient.allowInsecureRequests]
+//     }
 
-    const clientDiscoveryRequestOptions: oidcClient.DiscoveryRequestOptions = {
-      algorithm: 'oidc',
-    }
+//     const oidcServer = new URL(_discoveryUrl)
+//     this.clientConfigPromise = oidcClient
+//       .discovery(
+//         oidcServer,
+//         clientId,
+//         undefined, // clientMetadata,
+//         clientAuth,
+//         clientDiscoveryRequestOptions,
+//       )
+//       .catch((error) => {
+//         logger.error({
+//           meta: {
+//             action: 'AuthSsoServiceClass.constructor',
+//             error,
+//           },
+//           message: 'Error while discovering SSO client configuration',
+//           error,
+//         })
+//         throw new SsoCreateRedirectUrlError()
+//       })
+//   }
 
-    if (isDev) {
-      clientDiscoveryRequestOptions.execute = [oidcClient.allowInsecureRequests]
-    }
+//   getClientConfigResult(): ResultAsync<
+//     oidcClient.Configuration,
+//     SsoCreateRedirectUrlError
+//   > {
+//     const logMeta = {
+//       action: 'getClientConfigResult',
+//     }
+//     return ResultAsync.fromPromise(this.clientConfigPromise, (error) => {
+//       logger.error({
+//         message: 'Error while retrieving SSO client configuration',
+//         meta: logMeta,
+//         error,
+//       })
+//       return new SsoCreateRedirectUrlError()
+//     })
+//   }
+//   /**
+//    * Create a URL to SSO which is used to redirect the user for authentication
+//    * @returns The redirectUrl and the associated code verifier
+//    */
+//   createRedirectUrl(): ResultAsync<
+//     { redirectUrl: string; codeVerifier: string; nonce: string },
+//     SsoCreateRedirectUrlError
+//   > {
+//     const logMeta = {
+//       action: 'createRedirectUrl',
+//     }
 
-    const oidcServer = new URL(_discoveryUrl)
-    this.clientConfigPromise = oidcClient.discovery(
-      oidcServer,
-      clientId,
-      undefined, // clientMetadata,
-      clientAuth,
-      clientDiscoveryRequestOptions,
-    )
-  }
+//     logger.info({
+//       message: `Starting sso login flow`,
+//       meta: logMeta,
+//     })
 
-  getClientConfigResult(): ResultAsync<
-    oidcClient.Configuration,
-    SsoCreateRedirectUrlError
-  > {
-    this.ensureInitialized()
-    const logMeta = {
-      action: 'getClientConfigResult',
-    }
+//     const codeVerifier = oidcClient.randomPKCECodeVerifier()
 
-    if (!this.clientConfigPromise) {
-      logger.error({
-        message: 'SSO client configuration promise is not initialized',
-        meta: logMeta,
-      })
-      return errAsync(new SsoCreateRedirectUrlError())
-    }
+//     const codeChallengeResult = ResultAsync.fromPromise(
+//       oidcClient.calculatePKCECodeChallenge(codeVerifier),
+//       (error) => {
+//         logger.error({
+//           message: 'Error while calculating PKCE code challenge',
+//           meta: logMeta,
+//           error,
+//         })
+//         return new SsoCreateRedirectUrlError()
+//       },
+//     )
+//     return ResultAsync.combine([
+//       this.getClientConfigResult(),
+//       codeChallengeResult,
+//     ]).andThen(([clientConfig, codeChallenge]) => {
+//       const nonce = oidcClient.randomNonce()
 
-    return ResultAsync.fromPromise(this.clientConfigPromise, (error) => {
-      logger.error({
-        message: 'Error while retrieving SSO client configuration',
-        meta: logMeta,
-        error,
-      })
-      return new SsoCreateRedirectUrlError()
-    })
-  }
-  /**
-   * Create a URL to SSO which is used to redirect the user for authentication
-   * @returns The redirectUrl and the associated code verifier
-   */
-  createRedirectUrl(): ResultAsync<
-    { redirectUrl: string; codeVerifier: string; nonce: string },
-    SsoCreateRedirectUrlError
-  > {
-    const logMeta = {
-      action: 'createRedirectUrl',
-    }
+//       const params: Record<string, string> = {
+//         code_challenge: codeChallenge,
+//         state: nonce,
+//         scope: ['openid', 'email'].join(' '),
+//         code_challenge_method: 'S256',
+//       }
 
-    logger.info({
-      message: `Starting sso login flow`,
-      meta: logMeta,
-    })
+//       if (clientConfig.serverMetadata().supportsPKCE()) {
+//         params.state = nonce
+//       }
 
-    const codeVerifier = oidcClient.randomPKCECodeVerifier()
+//       const redirectTo: URL = oidcClient.buildAuthorizationUrl(
+//         clientConfig,
+//         params,
+//       )
 
-    const codeChallengeResult = ResultAsync.fromPromise(
-      oidcClient.calculatePKCECodeChallenge(codeVerifier),
-      (error) => {
-        logger.error({
-          message: 'Error while calculating PKCE code challenge',
-          meta: logMeta,
-          error,
-        })
-        return new SsoCreateRedirectUrlError()
-      },
-    )
-    return ResultAsync.combine([
-      this.getClientConfigResult(),
-      codeChallengeResult,
-    ]).andThen(([clientConfig, codeChallenge]) => {
-      const nonce = oidcClient.randomNonce()
+//       return okAsync({
+//         redirectUrl: redirectTo.toString(),
+//         codeVerifier,
+//         nonce,
+//       })
+//     })
+//   }
 
-      const params: Record<string, string> = {
-        code_challenge: codeChallenge,
-        state: nonce,
-        scope: ['openid', 'email'].join(' '),
-        code_challenge_method: 'S256',
-      }
+//   retrieveAccessToken(
+//     codeVerifier: string,
+//     nonce: string,
+//     currentUrl: string,
+//   ): ResultAsync<oidcClient.TokenEndpointResponse, SsoCreateRedirectUrlError> {
+//     const logMeta = {
+//       action: 'retrieveAccessToken',
+//     }
 
-      if (clientConfig.serverMetadata().supportsPKCE()) {
-        params.state = nonce
-      }
+//     return this.getClientConfigResult().andThen((clientConfig) => {
+//       return ResultAsync.fromPromise(
+//         oidcClient.authorizationCodeGrant(
+//           clientConfig,
+//           new URL(resolveAppUrl(currentUrl)),
+//           {
+//             pkceCodeVerifier: codeVerifier,
+//             expectedState: nonce,
+//             idTokenExpected: true,
+//           },
+//           {},
+//           {},
+//         ),
+//         (error) => {
+//           logger.error({
+//             message: 'Error while retrieving access token from SSO',
+//             meta: { ...logMeta, error },
+//             error,
+//           })
+//           return new SsoCreateRedirectUrlError()
+//         },
+//       )
+//     })
+//   }
 
-      const redirectTo: URL = oidcClient.buildAuthorizationUrl(
-        clientConfig,
-        params,
-      )
+//   retrieveUserInfo(
+//     tokens: oidcClient.TokenEndpointResponse,
+//   ): ResultAsync<{ sub: string; email: string }, SsoCreateRedirectUrlError> {
+//     const logMeta = {
+//       action: 'retrieveUserInfo',
+//     }
 
-      return okAsync({
-        redirectUrl: redirectTo.toString(),
-        codeVerifier,
-        nonce,
-      })
-    })
-  }
+//     logger.info({
+//       message: `Retrieving user info from SSO`,
+//       meta: logMeta,
+//     })
 
-  retrieveAccessToken(
-    codeVerifier: string,
-    nonce: string,
-    currentUrl: string,
-  ): ResultAsync<oidcClient.TokenEndpointResponse, SsoCreateRedirectUrlError> {
-    const logMeta = {
-      action: 'retrieveAccessToken',
-    }
+//     return this.getClientConfigResult().andThen((clientConfig) => {
+//       return ResultAsync.fromPromise(
+//         oidcClient.fetchUserInfo(
+//           clientConfig,
+//           tokens.access_token,
+//           getValidatedIdTokenClaims(tokens)?.sub ?? '',
+//         ),
+//         (error) => {
+//           logger.error({
+//             message: 'Error while retrieving user info from SSO',
+//             meta: logMeta,
+//             error,
+//           })
+//           return new SsoCreateRedirectUrlError()
+//         },
+//       ).map((userInfo) => {
+//         logger.info({
+//           message: `Successfully retrieved user info from SSO`,
+//           meta: { ...logMeta, userInfo },
+//         })
 
-    return this.getClientConfigResult().andThen((clientConfig) => {
-      return ResultAsync.fromPromise(
-        oidcClient.authorizationCodeGrant(
-          clientConfig,
-          new URL(resolveAppUrl(currentUrl)),
-          {
-            pkceCodeVerifier: codeVerifier,
-            expectedState: nonce,
-            idTokenExpected: true,
-          },
-          {},
-          {},
-        ),
-        (error) => {
-          logger.error({
-            message: 'Error while retrieving access token from SSO',
-            meta: { ...logMeta, error },
-            error,
-          })
-          return new SsoCreateRedirectUrlError()
-        },
-      )
-    })
-  }
+//         return userInfo as { sub: string; email: string }
+//       })
+//     })
+//   }
+// }
 
-  retrieveUserInfo(
-    tokens: oidcClient.TokenEndpointResponse,
-  ): ResultAsync<{ sub: string; email: string }, SsoCreateRedirectUrlError> {
-    const logMeta = {
-      action: 'retrieveUserInfo',
-    }
-
-    logger.info({
-      message: `Retrieving user info from SSO`,
-      meta: logMeta,
-    })
-
-    return this.getClientConfigResult().andThen((clientConfig) => {
-      return ResultAsync.fromPromise(
-        oidcClient.fetchUserInfo(
-          clientConfig,
-          tokens.access_token,
-          getValidatedIdTokenClaims(tokens)?.sub ?? '',
-        ),
-        (error) => {
-          logger.error({
-            message: 'Error while retrieving user info from SSO',
-            meta: logMeta,
-            error,
-          })
-          return new SsoCreateRedirectUrlError()
-        },
-      ).map((userInfo) => {
-        logger.info({
-          message: `Successfully retrieved user info from SSO`,
-          meta: { ...logMeta, userInfo },
-        })
-
-        return userInfo as { sub: string; email: string }
-      })
-    })
-  }
-}
-
-export const AuthSsoService = new AuthSsoServiceClass(sso)
+// export const AuthSsoService = new AuthSsoServiceClass(sso)
