@@ -28,6 +28,8 @@ setup:
 
     echo "Installing dependencies and initial setup..."
     cd .formsg-base
+    npm i
+
     # npm install && npm --prefix serverless/virus-scanner install
     if [ ! -d "dist" ]; then
         echo "Building frontend assets..."
