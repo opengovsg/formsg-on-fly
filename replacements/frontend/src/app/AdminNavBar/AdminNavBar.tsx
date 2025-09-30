@@ -254,9 +254,6 @@ export const AdminNavBar = ({ isMenuOpen }: AdminNavBarProps): JSX.Element => {
             defaultIsOpen={isMenuOpen}
             menuListProps={{ maxWidth: '19rem' }}
           >
-            <Menu.Item as={ReactLink} to="/billing">
-              {t('features.app.adminNavBar.avatarMenuItem.billing')}
-            </Menu.Item>
             <Menu.Item onClick={onTransferOwnershipModalOpen}>
               {t('features.app.adminNavBar.avatarMenuItem.transferAllForms')}
             </Menu.Item>
