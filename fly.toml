@@ -103,6 +103,11 @@ swap_size_mb = 1024
   SES_CONFIG_SET="notused"
   # GROWTHBOOK_CLIENT_KEY - set as secret via fly
 
+  # SSO
+  SSO_DISCOVERY_URL="https://sso.open.gov.sg/api/oidc/.well-known/openid-configuration"
+  SSO_CLIENT_ID="client-id"
+  SSO_CLIENT_SECRET="test"
+
 [http_service]
   internal_port = 5000
   force_https = true
