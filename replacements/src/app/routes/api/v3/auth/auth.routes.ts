@@ -5,7 +5,7 @@ import * as AuthController from '../../../../modules/auth/auth.controller'
 import { limitRate } from '../../../../utils/limit-rate'
 
 import { AuthSGIDRouter } from './auth-sgid.routes'
-import { AuthSsoRouter } from './auth-sso.routes'
+// import { AuthSsoRouter } from './auth-sso.routes'
 
 export const AuthRouter = Router()
 /**
