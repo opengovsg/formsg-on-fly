@@ -28,17 +28,21 @@ const openGovUserIds = db.users
     },
     { _id: 1 }
   )
+  .toArray()
   .map((u) => u._id);
 
-// Delete forms and submissions NOT created by the users above
+// Get IDs of forms created by these users
+const preservedFormIds = db.forms
+  .find({ admin: { $in: openGovUserIds } }, { _id: 1 })
+  .toArray()
+  .map((f) => f._id);
+
+// Delete submissions for forms NOT created by preserved users
 db.submissions.deleteMany({
-  form: {
-    $nin: db.forms
-      .find({ admin: { $in: openGovUserIds } }, { _id: 1 })
-      .map((f) => f._id),
-  },
+  form: { $nin: preservedFormIds },
 });
 
+// Delete forms NOT created by preserved users
 db.forms.deleteMany({
   admin: { $nin: openGovUserIds },
 });
