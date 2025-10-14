@@ -100,7 +100,7 @@ swap_size_mb = 1024
   POSTMAN_MOP_CAMPAIGN_API_KEY="notused"
   POSTMAN_BASE_URL="notused"
 
-  SES_CONFIG_SET="notused"
+  SES_CONFIG_SET="formsg-demo"
   # GROWTHBOOK_CLIENT_KEY - set as secret via fly
 
 [http_service]
