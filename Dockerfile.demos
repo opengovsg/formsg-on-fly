@@ -99,6 +99,8 @@ RUN addgroup -S formsguser && adduser -S -g formsguser formsguser
 USER formsguser
 
 ENV NODE_ENV=production
+ENV VITE_APP_FORMSG_SDK_MODE=development
+# dev mode SDK to not use staging/production signing keys
 EXPOSE 5000
 
 # tini is the init process that will adopt orphaned zombie processes
