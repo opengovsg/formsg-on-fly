@@ -29,6 +29,7 @@ swap_size_mb = 1024
   VIRUS_SCANNER_QUARANTINE_S3_BUCKET = "form-virus-scanner-quarantine-bucket"
   VIRUS_SCANNER_CLEAN_S3_BUCKET = "form-virus-scanner-clean-bucket"
   FORMSG_SDK_MODE = "development"
+  VITE_APP_FORMSG_SDK_MODE = "development"
   BOUNCE_LIFE_SPAN = "86400000"
   SECRET_ENV = "development"
   SUBMISSIONS_RATE_LIMIT = "200"
