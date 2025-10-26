@@ -38,6 +38,7 @@ export const CSP_CORE_DIRECTIVES = {
     'https://ssl.google-analytics.com/',
     'https://*.browser-intake-datadoghq.com',
     'https://sentry.io/api/',
+    'https://cdn.growthbook.io',
     ...new Set([
       new URL(config.aws.attachmentBucketUrl).hostname,
       new URL(config.aws.imageBucketUrl).hostname,

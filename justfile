@@ -9,15 +9,24 @@ setup:
         exit 1
     fi
 
+    # Read version from .formsg-version file
+    if [ ! -f ".formsg-version" ]; then
+        echo "❌ .formsg-version file not found"
+        exit 1
+    fi
+
+    FORMSG_VERSION=$(cat .formsg-version | tr -d '[:space:]')
+    echo "📌 Using FormSG version: $FORMSG_VERSION"
+
     if [ ! -d ".formsg-base" ]; then
         echo "📦 Cloning FormSG base repository..."
-        git clone --depth 1 --branch release-al2 https://github.com/opengovsg/FormSG.git .formsg-base
+        git clone --depth 1 --branch "$FORMSG_VERSION" https://github.com/opengovsg/FormSG.git .formsg-base
         echo "✅ FormSG base cloned successfully"
     else
         echo "📁 FormSG base already exists, updating..."
         cd .formsg-base
-        git fetch origin release-al2
-        git reset --hard origin/release-al2
+        git fetch origin "$FORMSG_VERSION"
+        git reset --hard "$FORMSG_VERSION"
         cd ..
         echo "✅ FormSG base updated successfully"
     fi
@@ -93,12 +102,22 @@ diff:
     echo "🔍 Showing differences between demo replacements and base FormSG..."
     echo ""
 
+    # Read version from .formsg-version file
+    if [ ! -f ".formsg-version" ]; then
+        echo "❌ .formsg-version file not found"
+        exit 1
+    fi
+
+    FORMSG_VERSION=$(cat .formsg-version | tr -d '[:space:]')
+    echo "📌 Using FormSG version: $FORMSG_VERSION"
+    echo ""
+
     # Temp directory, create and clean up on exit
     temp_base=$(mktemp -d)
     trap "rm -rf $temp_base" EXIT
 
     echo "📦 Cloning fresh base FormSG for comparison..."
-    git clone --depth 1 --branch release-al2 https://github.com/opengovsg/FormSG.git "$temp_base" --quiet
+    git clone --depth 1 --branch "$FORMSG_VERSION" https://github.com/opengovsg/FormSG.git "$temp_base" --quiet
 
     find replacements -type f | while read replacement_file; do
         rel_path="${replacement_file#replacements/}"

@@ -9,6 +9,7 @@ on:
       - 'fly.toml'
       - 'Dockerfile.demos'
       - 'bin/**'
+      - '.formsg-version'
       - '.github/workflows/ci.yml'
   pull_request:
     types: [opened, reopened, synchronize]
@@ -17,10 +18,8 @@ on:
       - 'fly.toml'
       - 'Dockerfile.demos'
       - 'bin/**'
+      - '.formsg-version'
       - '.github/workflows/ci.yml'
-  schedule:
-    # Monday 1PM GMT+8 = Monday 5AM UTC
-    - cron: '0 5 * * 1'
 
 jobs:
   deploy:
@@ -30,16 +29,23 @@ jobs:
       DOCKER_REPO: registry.fly.io
       APP_NAME: formsg
     steps:
-      - name: Checkout FormSG base
-        uses: actions/checkout@v4
-        with:
-          repository: opengovsg/FormSG
-          ref: release-al2
-
       - name: Checkout demo overlay
         uses: actions/checkout@v4
         with:
           path: demo-overlay
+
+      - name: Read FormSG version
+        id: formsg-version
+        run: |
+          VERSION=$(cat demo-overlay/.formsg-version | tr -d '[:space:]')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Using FormSG version: $VERSION"
+
+      - name: Checkout FormSG base
+        uses: actions/checkout@v4
+        with:
+          repository: opengovsg/FormSG
+          ref: ${{ steps.formsg-version.outputs.version }}
 
       - name: Apply demo customizations
         run: |
