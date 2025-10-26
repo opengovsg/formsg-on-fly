@@ -29,23 +29,30 @@ jobs:
       DOCKER_REPO: registry.fly.io
       APP_NAME: formsg
     steps:
-      - name: Checkout demo overlay
+      - name: Checkout demo overlay (temp for version reading)
         uses: actions/checkout@v4
         with:
-          path: demo-overlay
+          sparse-checkout: .formsg-version
+          path: version-reader
 
       - name: Read FormSG version
         id: formsg-version
         run: |
-          VERSION=$(cat demo-overlay/.formsg-version | tr -d '[:space:]')
+          VERSION=$(cat version-reader/.formsg-version | tr -d '[:space:]')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Using FormSG version: $VERSION"
+          rm -rf version-reader
 
       - name: Checkout FormSG base
         uses: actions/checkout@v4
         with:
           repository: opengovsg/FormSG
           ref: ${{ steps.formsg-version.outputs.version }}
+
+      - name: Checkout demo overlay
+        uses: actions/checkout@v4
+        with:
+          path: demo-overlay
 
       - name: Apply demo customizations
         run: |
