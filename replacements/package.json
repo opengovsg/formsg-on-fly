@@ -66,7 +66,7 @@
     "@opengovsg/formsg-sdk": "^0.15.0",
     "@opengovsg/myinfo-gov-client": "^4.1.2",
     "@opengovsg/sgid-client": "^2.2.0",
-    "@react-email/components": "^0.0.26",
+    "@react-email/components": "^1.0.12",
     "@react-email/render": "^1.0.5",
     "@smithy/util-stream": "^4.2.1",
     "@stablelib/base64": "^1.0.1",
