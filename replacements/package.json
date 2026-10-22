@@ -79,7 +79,7 @@
     "boxicons": "1.8.0",
     "bson": "^5.5.0",
     "busboy": "^1.6.0",
-    "canvas": "^3.1.2",
+    "canvas": "^3.2.3",
     "celebrate": "^15.0.3",
     "compression": "~1.8.2",
     "connect-datadog": "0.0.9",
